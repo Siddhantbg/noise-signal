@@ -122,7 +122,6 @@ function App() {
     document.body.style.backgroundPosition = 'center';
     document.body.style.backgroundAttachment = 'fixed';
   }, []);
-  };
 
 
 
@@ -154,7 +153,7 @@ function App() {
       
 
     }
-  }, [isLoading, background]);
+  }, [isLoading]);
 
   if (isLoading) {
     return (
