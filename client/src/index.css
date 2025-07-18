@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Default theme (Minimal Light) */
+    --color-primary: #6366F1;
+    --color-secondary: #F59E0B;
+    --color-noise: #EF4444;
+    --color-signal: #10B981;
+    --color-background: #F9FAFB;
+  }
+
+  .dark {
+    --color-background: #1F2937;
+    color-scheme: dark;
+  }
+
+  /* Forest Theme */
+  .theme-forest {
+    --color-primary: #2D6A4F;
+    --color-secondary: #D9A21B;
+    --color-noise: #BC4749;
+    --color-signal: #40916C;
+    --color-background: #F8F9FA;
+  }
+  .theme-forest.dark {
+    --color-background: #1B2D2A;
+  }
+
+  /* Interstellar Theme */
+  .theme-interstellar {
+    --color-primary: #6246EA;
+    --color-secondary: #E45858;
+    --color-noise: #FF5470;
+    --color-signal: #3BCEAC;
+    --color-background: #EFF1FA;
+  }
+  .theme-interstellar.dark {
+    --color-background: #232946;
+  }
+
+  /* Cyber Night Theme */
+  .theme-cyber {
+    --color-primary: #0EA5E9;
+    --color-secondary: #F43F5E;
+    --color-noise: #FB7185;
+    --color-signal: #14B8A6;
+    --color-background: #F8FAFC;
+  }
+  .theme-cyber.dark {
+    --color-background: #0F172A;
+  }
+
+  html {
+    font-family: 'Inter', 'Poppins', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-background text-gray-800 min-h-screen dark:text-gray-100 transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
+  }
+  .btn-primary {
+    @apply bg-primary text-white hover:opacity-90;
+  }
+  .btn-secondary {
+    @apply bg-secondary text-white hover:opacity-90;
+  }
+  .tab-button {
+    @apply px-4 py-2 font-medium transition-all duration-200 border-b-2 border-transparent;
+  }
+  .tab-button-active {
+    @apply border-primary text-primary;
+  }
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white;
+  }
+  .card {
+    @apply bg-white p-4 rounded-lg shadow-md dark:bg-gray-800 dark:text-gray-100 transition-colors duration-200;
+  }
+  .theme-toggle {
+    @apply p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200;
+  }
+  .theme-option {
+    @apply flex items-center p-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700;
+  }
+  .theme-option-active {
+    @apply bg-gray-100 dark:bg-gray-700;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Background image styles */
+.bg-image {
+  @apply fixed inset-0 w-full h-full object-cover z-[-1];
+}
+
+.bg-overlay {
+  @apply fixed inset-0 bg-white bg-opacity-70 backdrop-blur-sm z-[-1] dark:bg-black dark:bg-opacity-70;
+}
+
+/* Countdown animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.countdown-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
