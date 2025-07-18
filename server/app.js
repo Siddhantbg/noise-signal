@@ -39,6 +39,7 @@ mongoose.connect(mongoURI, {
 
 // Routes
 app.use('/api/countdown', countdownRoutes);
+app.use('/api/backgrounds', require('./routes/backgroundsRoutes'));
 app.use('/api/background', backgroundRoutes);
 app.use('/api/lists', listRoutes);
 

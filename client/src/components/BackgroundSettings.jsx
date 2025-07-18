@@ -1,15 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-const predefinedBackgrounds = [
-  'backgrounds/forest.svg',
-  'backgrounds/galaxy.svg',
-  'backgrounds/clean-light.svg',
-];
+import axios from 'axios';
 
 const BackgroundSettings = () => {
+  const [predefinedBackgrounds, setPredefinedBackgrounds] = useState([]);
   const [selectedBackground, setSelectedBackground] = useState('');
   const [customBackground, setCustomBackground] = useState('');
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchBackgrounds = async () => {
+      try {
+        const res = await axios.get('/api/backgrounds');
+        setPredefinedBackgrounds(res.data);
+      } catch (err) {
+        console.error('Error fetching backgrounds:', err);
+      }
+    };
+
+    fetchBackgrounds();
+  }, []);
 
   useEffect(() => {
     const storedCustom = localStorage.getItem('customBackground');
@@ -20,18 +29,19 @@ const BackgroundSettings = () => {
       document.body.style.backgroundImage = `url(${storedCustom})`;
     } else if (storedSelected) {
       setSelectedBackground(storedSelected);
-      document.body.style.backgroundImage = `url(${storedSelected})`;
+      document.body.style.backgroundImage = `url(${process.env.PUBLIC_URL}/${storedSelected})`;
     } else {
       document.body.style.backgroundImage = 'none';
     }
   }, []);
 
   const handleSelect = (bg) => {
+    const bgUrl = `${process.env.PUBLIC_URL}/${bg}`;
     setSelectedBackground(bg);
     setCustomBackground('');
     localStorage.setItem('selectedBackground', bg);
     localStorage.removeItem('customBackground');
-    document.body.style.backgroundImage = `url(${bg})`;
+    document.body.style.backgroundImage = `url(${bgUrl})`;
   };
 
   const handleUpload = (e) => {
@@ -67,7 +77,7 @@ const BackgroundSettings = () => {
             key={bg}
             onClick={() => handleSelect(bg)}
             className={`w-24 h-16 rounded-md cursor-pointer flex-shrink-0 bg-cover bg-center border-2 ${selectedBackground === bg && !customBackground ? 'border-blue-500' : 'border-transparent'}`}
-            style={{ backgroundImage: `url(${bg})` }}
+            style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/${bg})` }}
           ></div>
         ))}
       </div>

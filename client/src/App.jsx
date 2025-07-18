@@ -106,22 +106,7 @@ function App() {
     }
   };
 
-  // Apply background from localStorage on load
-  useEffect(() => {
-    const storedCustom = localStorage.getItem('customBackground');
-    const storedSelected = localStorage.getItem('selectedBackground');
 
-    if (storedCustom) {
-      document.body.style.backgroundImage = `url(${storedCustom})`;
-    } else if (storedSelected) {
-      document.body.style.backgroundImage = `url(${process.env.PUBLIC_URL}/${storedSelected})`;
-    } else {
-      document.body.style.backgroundImage = 'none';
-    }
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
-  }, []);
 
 
 
