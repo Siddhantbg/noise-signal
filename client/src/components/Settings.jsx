@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import BackgroundUploader from './BackgroundUploader';
+import BackgroundSettings from './BackgroundSettings';
 import ThemeSwitcher from './ThemeSwitcher';
 
 const Settings = ({ 
   onClose, 
   countdownTarget, 
   updateCountdownTarget, 
-  background, 
-  updateBackground, 
-  resetBackground,
   isDarkMode,
   toggleDarkMode,
   currentTheme,
@@ -88,11 +85,7 @@ const Settings = ({
           </div>
           
           {/* Background settings */}
-        <BackgroundUploader 
-          currentBackground={background}
-          onBackgroundChange={updateBackground}
-          onBackgroundReset={resetBackground}
-        />
+        <BackgroundSettings />
         
         {/* Theme settings */}
         <ThemeSwitcher

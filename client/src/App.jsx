@@ -3,14 +3,14 @@ import axios from 'axios';
 import Countdown from './components/Countdown';
 import TabSwitcher from './components/TabSwitcher';
 import List from './components/List';
-import BackgroundUploader from './components/BackgroundUploader';
+
 import Settings from './components/Settings';
 import { gsap } from 'gsap';
 
 function App() {
   const [activeTab, setActiveTab] = useState('signal');
   const [countdownTarget, setCountdownTarget] = useState(null);
-  const [background, setBackground] = useState(null);
+
   const [showSettings, setShowSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,11 +72,7 @@ function App() {
           setCountdownTarget(defaultTarget);
         }
         
-        // Fetch background image
-        const bgRes = await axios.get('/api/background');
-        if (bgRes.data && bgRes.data.imageData) {
-          setBackground(bgRes.data.imageData);
-        }
+
       } catch (err) {
         console.error('Error fetching initial data:', err);
         setError('Failed to load app data. Please try again.');
@@ -110,28 +106,25 @@ function App() {
     }
   };
 
-  // Update background image in the database
-  const updateBackground = async (imageData) => {
-    try {
-      setBackground(imageData);
-      await axios.post('/api/background', { imageData });
-    } catch (err) {
-      console.error('Error updating background:', err);
-      // Store in local storage as fallback
-      localStorage.setItem('background', imageData);
+  // Apply background from localStorage on load
+  useEffect(() => {
+    const storedCustom = localStorage.getItem('customBackground');
+    const storedSelected = localStorage.getItem('selectedBackground');
+
+    if (storedCustom) {
+      document.body.style.backgroundImage = `url(${storedCustom})`;
+    } else if (storedSelected) {
+      document.body.style.backgroundImage = `url(${process.env.PUBLIC_URL}/${storedSelected})`;
+    } else {
+      document.body.style.backgroundImage = 'none';
     }
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+  }, []);
   };
 
-  // Reset background to default (null)
-  const resetBackground = async () => {
-    try {
-      setBackground(null);
-      await axios.delete('/api/background');
-    } catch (err) {
-      console.error('Error resetting background:', err);
-      localStorage.removeItem('background');
-    }
-  };
+
 
   // Toggle settings panel
   const toggleSettings = () => {
@@ -159,14 +152,7 @@ function App() {
         ease: 'power3.out'
       });
       
-      // Animate background if present
-      if (background) {
-        gsap.from('.bg-image', {
-          opacity: 0,
-          duration: 1.2,
-          ease: 'power2.inOut'
-        });
-      }
+
     }
   }, [isLoading, background]);
 
@@ -196,13 +182,7 @@ function App() {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background image with overlay */}
-      {background && (
-        <>
-          <img src={background} alt="Background" className="bg-image" />
-          <div className="bg-overlay"></div>
-        </>
-      )}
+
       
       <div className="container mx-auto px-4 py-6 max-w-md">
         {/* App Header */}
@@ -257,9 +237,6 @@ function App() {
             onClose={toggleSettings}
             countdownTarget={countdownTarget}
             updateCountdownTarget={updateCountdownTarget}
-            background={background}
-            updateBackground={updateBackground}
-            resetBackground={resetBackground}
             isDarkMode={isDarkMode}
             toggleDarkMode={toggleDarkMode}
             currentTheme={currentTheme}
@@ -276,6 +253,6 @@ function App() {
       </div>
     </div>
   );
-}
+} 
 
 export default App;

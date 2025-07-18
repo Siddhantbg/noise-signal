@@ -41,7 +41,7 @@ const List = ({ type }) => {
   const addItem = async () => {
     if (!newItem.trim()) return;
     
-    const updatedItems = [...items, newItem.trim()];
+    const updatedItems = [...items, { text: newItem.trim(), completed: false }];
     
     try {
       // Optimistically update UI
@@ -49,7 +49,7 @@ const List = ({ type }) => {
       setNewItem('');
       
       // Save to server
-      await axios.post(`/api/lists/${type}`, { entries: updatedItems });
+      await axios.post(`/api/lists/${type}`, { text: newItem.trim() });
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
@@ -71,7 +71,7 @@ const List = ({ type }) => {
   // Start editing an item
   const startEditing = (index) => {
     setEditingIndex(index);
-    setEditText(items[index]);
+    setEditText(items[index].text);
   };
 
   // Save edited item
@@ -79,7 +79,7 @@ const List = ({ type }) => {
     if (!editText.trim()) return;
     
     const updatedItems = [...items];
-    updatedItems[index] = editText.trim();
+    updatedItems[index].text = editText.trim();
     
     try {
       // Optimistically update UI
@@ -87,7 +87,7 @@ const List = ({ type }) => {
       setEditingIndex(null);
       
       // Save to server
-      await axios.put(`/api/lists/${type}`, { entries: updatedItems });
+      await axios.put(`/api/lists/${type}/${items[index]._id}`, { completed: items[index].completed, text: editText.trim() });
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
@@ -108,6 +108,7 @@ const List = ({ type }) => {
 
   // Delete an item
   const deleteItem = async (index) => {
+    const itemToDelete = items[index];
     const updatedItems = items.filter((_, i) => i !== index);
     
     try {
@@ -115,7 +116,7 @@ const List = ({ type }) => {
       setItems(updatedItems);
       
       // Save to server
-      await axios.delete(`/api/lists/${type}`, { data: { entries: updatedItems } });
+      await axios.delete(`/api/lists/${type}/${itemToDelete._id}`);
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
@@ -263,7 +264,7 @@ const List = ({ type }) => {
                 <>
                   <span className="flex items-center dark:text-gray-200">
                     <span className="mr-2">{getItemEmoji()}</span>
-                    {item}
+                    {item.text}
                   </span>
                   <div className="flex space-x-1">
                     <button 

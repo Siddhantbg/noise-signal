@@ -40,7 +40,7 @@ mongoose.connect(mongoURI, {
 // Routes
 app.use('/api/countdown', countdownRoutes);
 app.use('/api/background', backgroundRoutes);
-app.use('/api/list', listRoutes);
+app.use('/api/lists', listRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

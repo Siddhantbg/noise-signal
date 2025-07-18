@@ -13,7 +13,7 @@ router.get('/:type', async (req, res) => {
       await list.save();
     }
     
-    res.json(list);
+    res.json({ type: list.type, entries: list.items });
   } catch (err) {
     res.status(500).json({ error: 'Error fetching list' });
   }
@@ -37,7 +37,7 @@ router.post('/:type', async (req, res) => {
     });
     
     await list.save();
-    res.json(list);
+    res.json({ type: list.type, entries: list.items });
   } catch (err) {
     res.status(500).json({ error: 'Error adding item to list' });
   }
@@ -47,7 +47,7 @@ router.post('/:type', async (req, res) => {
 router.put('/:type/:itemId', async (req, res) => {
   try {
     const { type, itemId } = req.params;
-    const { completed } = req.body;
+    const { completed, text } = req.body;
     
     const list = await TaskList.findOne({ type });
     if (!list) {
@@ -59,10 +59,11 @@ router.put('/:type/:itemId', async (req, res) => {
       return res.status(404).json({ error: 'Item not found' });
     }
     
-    item.completed = completed;
+    if (completed !== undefined) item.completed = completed;
+    if (text) item.text = text;
     await list.save();
     
-    res.json(list);
+    res.json({ type: list.type, entries: list.items });
   } catch (err) {
     res.status(500).json({ error: 'Error updating item' });
   }
@@ -81,7 +82,7 @@ router.delete('/:type/:itemId', async (req, res) => {
     list.items.pull(itemId);
     await list.save();
     
-    res.json(list);
+    res.json({ type: list.type, entries: list.items });
   } catch (err) {
     res.status(500).json({ error: 'Error deleting item' });
   }
