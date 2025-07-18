@@ -13,13 +13,29 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Get the MongoDB URI from the environment variables
+const mongoURI = process.env.MONGODB_URI;
+
+// Check if the MongoDB URI is set
+if (!mongoURI) {
+  console.error('MongoDB connection error: MONGODB_URI is not set in your .env file');
+  process.exit(1);
+}
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('Successfully connected to MongoDB!'))
+.catch(err => {
+  console.error('MongoDB connection error:', err.message);
+  console.log('\n--- Please check your MongoDB connection string in the .env file ---');
+  console.log('It should look like this: MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>?retryWrites=true&w=majority');
+  console.log('For local MongoDB: MONGODB_URI=mongodb://localhost:27017/<database-name>');
+  console.log('---------------------------------------------------------------------\n');
+});
+
 
 // Routes
 app.use('/api/countdown', countdownRoutes);
