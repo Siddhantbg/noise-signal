@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
 const BackgroundSettings = () => {
@@ -6,6 +7,15 @@ const BackgroundSettings = () => {
   const [selectedBackground, setSelectedBackground] = useState('');
   const [customBackground, setCustomBackground] = useState('');
   const fileInputRef = useRef(null);
+
+  const getUserId = () => {
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+      userId = uuidv4();
+      localStorage.setItem('userId', userId);
+    }
+    return userId;
+  };
 
   useEffect(() => {
     const fetchBackgrounds = async () => {
@@ -17,34 +27,70 @@ const BackgroundSettings = () => {
       }
     };
 
+    const fetchSettings = async () => {
+      const userId = getUserId();
+      try {
+        const res = await axios.get(`/api/user/background?userId=${userId}`);
+        const { backgroundType, backgroundValue } = res.data;
+        if (backgroundType === 'custom') {
+          setCustomBackground(backgroundValue);
+          document.body.style.backgroundImage = `url(${backgroundValue})`;
+        } else if (backgroundType === 'predefined') {
+          setSelectedBackground(backgroundValue);
+          document.body.style.backgroundImage = `url(${process.env.PUBLIC_URL}/${backgroundValue})`;
+        }
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+      } catch (err) {
+        // If no settings are found, we can just use local storage or defaults
+        const storedCustom = localStorage.getItem('customBackground');
+        const storedSelected = localStorage.getItem('selectedBackground');
+
+        if (storedCustom) {
+          setCustomBackground(storedCustom);
+          document.body.style.backgroundImage = `url(${storedCustom})`;
+        } else if (storedSelected) {
+          setSelectedBackground(storedSelected);
+          document.body.style.backgroundImage = `url(${process.env.PUBLIC_URL}/${storedSelected})`;
+        } else {
+          document.body.style.backgroundImage = 'none';
+        }
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+      }
+    };
+
     fetchBackgrounds();
+    fetchSettings();
   }, []);
 
-  useEffect(() => {
-    const storedCustom = localStorage.getItem('customBackground');
-    const storedSelected = localStorage.getItem('selectedBackground');
-
-    if (storedCustom) {
-      setCustomBackground(storedCustom);
-      document.body.style.backgroundImage = `url(${storedCustom})`;
-    } else if (storedSelected) {
-      setSelectedBackground(storedSelected);
-      document.body.style.backgroundImage = `url(${process.env.PUBLIC_URL}/${storedSelected})`;
-    } else {
-      document.body.style.backgroundImage = 'none';
-    }
-  }, []);
-
-  const handleSelect = (bg) => {
+  const handleSelect = async (bg) => {
+    const userId = getUserId();
     const bgUrl = `${process.env.PUBLIC_URL}/${bg}`;
     setSelectedBackground(bg);
     setCustomBackground('');
     localStorage.setItem('selectedBackground', bg);
     localStorage.removeItem('customBackground');
     document.body.style.backgroundImage = `url(${bgUrl})`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+
+    try {
+      await axios.post('/api/user/background', {
+        userId,
+        backgroundType: 'predefined',
+        backgroundValue: bg,
+      });
+    } catch (err) {
+      console.error('Error saving background:', err);
+    }
   };
 
   const handleUpload = (e) => {
+    const userId = getUserId();
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -55,17 +101,37 @@ const BackgroundSettings = () => {
         localStorage.setItem('customBackground', base64String);
         localStorage.removeItem('selectedBackground');
         document.body.style.backgroundImage = `url(${base64String})`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+
+        axios.post('/api/user/background', {
+          userId,
+          backgroundType: 'custom',
+          backgroundValue: base64String,
+        }).catch(err => console.error('Error saving background:', err));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    const userId = getUserId();
     setCustomBackground('');
     setSelectedBackground('');
     localStorage.removeItem('customBackground');
     localStorage.removeItem('selectedBackground');
     document.body.style.backgroundImage = 'none'; // Revert to default
+
+    try {
+      await axios.post('/api/user/background', {
+        userId,
+        backgroundType: 'none',
+        backgroundValue: 'none',
+      });
+    } catch (err) {
+      console.error('Error resetting background:', err);
+    }
   };
 
   return (
