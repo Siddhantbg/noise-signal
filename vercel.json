@@ -3,17 +3,17 @@
   "builds": [
     {
       "src": "server/app.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["../client/build/**"] }
     }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/server/app.js" }
+  "routes": [
+    { "src": "/static/(.*)", "dest": "/client/build/static/$1" },
+    { "src": "/manifest.json", "dest": "/client/build/manifest.json" },
+    { "src": "/favicon.ico", "dest": "/client/build/favicon.ico" },
+    { "src": "/logo192.png", "dest": "/client/build/logo192.png" },
+    { "src": "/logo512.png", "dest": "/client/build/logo512.png" },
+    { "src": "/api/(.*)", "dest": "/server/app.js" },
+    { "src": "/(.*)", "dest": "/server/app.js" }
   ]
 }
