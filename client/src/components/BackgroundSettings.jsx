@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { serverUrl } from '../apiConfig';
 import { useBackground } from '../hooks/useBackground';
 
 const BackgroundSettings = () => {
@@ -10,7 +11,7 @@ const BackgroundSettings = () => {
   useEffect(() => {
     const fetchBackgrounds = async () => {
       try {
-        const res = await axios.get('/api/backgrounds');
+        const res = await axios.get(`${serverUrl}/api/backgrounds`);
         setPredefinedBackgrounds(res.data);
       } catch (err) {
         console.error('Error fetching backgrounds:', err);

@@ -24,9 +24,11 @@ export const useBackground = () => {
       const userId = getUserId();
       try {
         const res = await axios.get(`${serverUrl}/api/user/background?userId=${userId}`);
-        const { backgroundType, backgroundValue } = res.data;
-        setBackground({ type: backgroundType, value: backgroundValue });
-        applyBackground(backgroundType, backgroundValue);
+        if (res.data) {
+          const { backgroundType, backgroundValue } = res.data;
+          setBackground({ type: backgroundType, value: backgroundValue });
+          applyBackground(backgroundType, backgroundValue);
+        }
       } catch (err) {
         const storedCustom = localStorage.getItem('customBackground');
         const storedSelected = localStorage.getItem('selectedBackground');

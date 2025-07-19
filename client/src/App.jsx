@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { serverUrl } from './apiConfig';
 import Countdown from './components/Countdown';
 import TabSwitcher from './components/TabSwitcher';
 import List from './components/List';
@@ -64,7 +65,7 @@ function App() {
         setIsLoading(true);
         
         // Fetch countdown target
-        const countdownRes = await axios.get('/api/countdown');
+        const countdownRes = await axios.get(`${serverUrl}/api/countdown`);
         if (countdownRes.data && countdownRes.data.targetTime) {
           setCountdownTarget(new Date(countdownRes.data.targetTime));
         } else {
@@ -95,7 +96,7 @@ function App() {
   const updateCountdownTarget = async (newTarget) => {
     try {
       setCountdownTarget(newTarget);
-      await axios.post('/api/countdown', { targetTime: newTarget.toISOString() });
+      await axios.post(`${serverUrl}/api/countdown`, { targetTime: newTarget.toISOString() });
     } catch (err) {
       console.error('Error updating countdown:', err);
       // Store in local storage as fallback
