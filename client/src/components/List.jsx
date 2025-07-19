@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { serverUrl } from '../apiConfig';
 
 const List = ({ type }) => {
   const [items, setItems] = useState([]);
@@ -14,7 +15,7 @@ const List = ({ type }) => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await axios.get(`/api/lists/${type}`);
+      const response = await axios.get(`${serverUrl}/api/lists/${type}`);
       setItems(response.data.entries || []);
     } catch (err) {
       console.error(`Error fetching ${type} items:`, err);
@@ -50,7 +51,7 @@ const List = ({ type }) => {
       setNewItem('');
       
       // Save to server
-      await axios.post(`/api/lists/${type}`, { text: newItem.trim() });
+      await axios.post(`${serverUrl}/api/lists/${type}`, { text: newItem.trim() });
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
@@ -88,7 +89,7 @@ const List = ({ type }) => {
       setEditingIndex(null);
       
       // Save to server
-      await axios.put(`/api/lists/${type}/${items[index]._id}`, { completed: items[index].completed, text: editText.trim() });
+      await axios.put(`${serverUrl}/api/lists/${type}/${items[index]._id}`, { completed: items[index].completed, text: editText.trim() });
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
@@ -117,7 +118,7 @@ const List = ({ type }) => {
       setItems(updatedItems);
       
       // Save to server
-      await axios.delete(`/api/lists/${type}/${itemToDelete._id}`);
+      await axios.delete(`${serverUrl}/api/lists/${type}/${itemToDelete._id}`);
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { getUserId } from '../utils/userId';
+import { serverUrl } from '../apiConfig';
 
 export const useBackground = () => {
   const [background, setBackground] = useState({ type: '', value: '' });
@@ -22,7 +23,7 @@ export const useBackground = () => {
     const fetchSettings = async () => {
       const userId = getUserId();
       try {
-        const res = await axios.get(`/api/user/background?userId=${userId}`);
+        const res = await axios.get(`${serverUrl}/api/user/background?userId=${userId}`);
         const { backgroundType, backgroundValue } = res.data;
         setBackground({ type: backgroundType, value: backgroundValue });
         applyBackground(backgroundType, backgroundValue);
@@ -60,7 +61,7 @@ export const useBackground = () => {
     }
 
     try {
-      await axios.post('/api/user/background', {
+      await axios.post(`${serverUrl}/api/user/background`, {
         userId,
         backgroundType: type,
         backgroundValue: value,
