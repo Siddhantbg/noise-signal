@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
+
 const mongoose = require('mongoose');
 const cors = require('cors');
 const countdownRoutes = require('./routes/countdownRoutes');
@@ -45,14 +45,7 @@ app.use('/api/user/background', require('./routes/userSettingsRoutes'));
 app.use('/api/background', backgroundRoutes);
 app.use('/api/lists', listRoutes);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../client/build')));
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
