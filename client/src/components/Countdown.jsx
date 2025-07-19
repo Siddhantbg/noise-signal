@@ -1,35 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const Countdown = ({ targetDate }) => {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-  
-  // Calculate time left between now and target date
-  function calculateTimeLeft() {
+    const calculateTimeLeft = useCallback(() => {
     if (!targetDate) return { hours: 0, minutes: 0, seconds: 0 };
-    
+
     const difference = targetDate - new Date();
-    
+
     if (difference <= 0) {
       return { hours: 0, minutes: 0, seconds: 0 };
     }
-    
+
     // Calculate hours, minutes, seconds
     const hours = Math.floor(difference / (1000 * 60 * 60));
     const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-    
+
     return { hours, minutes, seconds };
-  }
-  
+  }, [targetDate]);
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
   // Update countdown every second
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
-    
+
     // Clean up interval on component unmount
     return () => clearInterval(timer);
-  }, [targetDate]);
+  }, [calculateTimeLeft]);
   
   // Format time with leading zeros
   const formatTime = (time) => {

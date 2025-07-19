@@ -5,9 +5,11 @@ import TabSwitcher from './components/TabSwitcher';
 import List from './components/List';
 
 import Settings from './components/Settings';
+import { useBackground } from './hooks/useBackground';
 import { gsap } from 'gsap';
 
 function App() {
+  useBackground();
   const [activeTab, setActiveTab] = useState('signal');
   const [countdownTarget, setCountdownTarget] = useState(null);
 

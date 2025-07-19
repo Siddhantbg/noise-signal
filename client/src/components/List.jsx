@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const List = ({ type }) => {
@@ -10,12 +10,7 @@ const List = ({ type }) => {
   const [error, setError] = useState(null);
 
   // Fetch items when type changes
-  useEffect(() => {
-    fetchItems();
-  }, [type]);
-
-  // Fetch items from the server
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -35,7 +30,13 @@ const List = ({ type }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [type]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+
 
   // Add a new item
   const addItem = async () => {
