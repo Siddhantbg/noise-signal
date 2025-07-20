@@ -15,6 +15,7 @@ router.get('/:type', async (req, res) => {
     
     res.json({ type: list.type, entries: list.items });
   } catch (err) {
+    console.error('Error fetching list:', err);
     res.status(500).json({ error: 'Error fetching list' });
   }
 });
@@ -39,6 +40,7 @@ router.post('/:type', async (req, res) => {
     await list.save();
     res.json({ type: list.type, entries: list.items });
   } catch (err) {
+    console.error('Error adding item to list:', err);
     res.status(500).json({ error: 'Error adding item to list' });
   }
 });
@@ -65,6 +67,7 @@ router.put('/:type/:itemId', async (req, res) => {
     
     res.json({ type: list.type, entries: list.items });
   } catch (err) {
+    console.error('Error updating item:', err);
     res.status(500).json({ error: 'Error updating item' });
   }
 });
@@ -84,6 +87,7 @@ router.delete('/:type/:itemId', async (req, res) => {
     
     res.json({ type: list.type, entries: list.items });
   } catch (err) {
+    console.error('Error deleting item:', err);
     res.status(500).json({ error: 'Error deleting item' });
   }
 });
