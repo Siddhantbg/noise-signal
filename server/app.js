@@ -13,7 +13,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'https://noise-signal-2ac2.vercel.app',
-  'https://noise-signal.vercel.app'
+  'https://noise-signal-server.onrender.com'
 ];
 
 app.use(cors({
