@@ -12,7 +12,8 @@ const app = express();
 // Middleware
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://noise-signal-2ac2.vercel.app' // Replace with your Vercel client URL
+  'https://noise-signal-2ac2.vercel.app',
+  'https://noise-signal.vercel.app'
 ];
 
 app.use(cors({
