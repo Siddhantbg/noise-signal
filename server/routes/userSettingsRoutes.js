@@ -11,7 +11,14 @@ router.get('/', async (req, res) => {
     }
     const settings = await UserSettings.findOne({ userId });
     if (!settings) {
-      return res.status(404).json({ msg: 'Settings not found' });
+      // If no settings, create default ones
+      const defaultSettings = new UserSettings({
+        userId,
+        backgroundType: 'default',
+        backgroundValue: ''
+      });
+      await defaultSettings.save();
+      return res.json(defaultSettings);
     }
     res.json(settings);
   } catch (err) {
