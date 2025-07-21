@@ -15,7 +15,7 @@ root.render(
 // Service workers are intentionally disabled for this application
 // A placeholder service-worker.js file exists in the public directory
 // to prevent MIME type errors when browsers request it
-serviceWorkerRegistration.unregister();
+// serviceWorkerRegistration.unregister();
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
