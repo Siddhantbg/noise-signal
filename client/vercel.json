@@ -13,6 +13,11 @@
     { "src": "/logo192.png", "dest": "/logo192.png" },
     { "src": "/logo512.png", "dest": "/logo512.png" },
     { "src": "/manifest.json", "dest": "/manifest.json" },
+    { 
+      "src": "/service-worker.js",
+      "headers": { "content-type": "application/javascript" },
+      "dest": "/service-worker.js"
+    },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
