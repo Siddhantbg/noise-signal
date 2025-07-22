@@ -10,6 +10,7 @@ const List = ({ type }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]); // For new item images
+  const [draggedIndex, setDraggedIndex] = useState(null); // For custom drag and drop
 
   // Fetch items when type changes
   const fetchItems = useCallback(async () => {
@@ -38,7 +39,63 @@ const List = ({ type }) => {
     fetchItems();
   }, [fetchItems]);
 
+  // Custom drag and drop handlers
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', '');
+    // Add visual feedback
+    e.target.style.opacity = '0.5';
+  };
 
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = '1';
+    setDraggedIndex(null);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+    
+    const newItems = [...items];
+    const draggedItem = newItems[draggedIndex];
+    
+    // Remove the dragged item
+    newItems.splice(draggedIndex, 1);
+    
+    // Insert at new position
+    if (draggedIndex < dropIndex) {
+      newItems.splice(dropIndex - 1, 0, draggedItem);
+    } else {
+      newItems.splice(dropIndex, 0, draggedItem);
+    }
+    
+    setItems(newItems);
+    localStorage.setItem(`${type}Items`, JSON.stringify(newItems));
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+  };
+
+
+  // Handle drag end
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+    const reordered = Array.from(items);
+    const [removed] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, removed);
+    setItems(reordered);
+    // Optionally, send new order to server here
+    localStorage.setItem(`${type}Items`, JSON.stringify(reordered));
+  };
 
   // Add a new item
   const addItem = async () => {
@@ -280,17 +337,29 @@ const List = ({ type }) => {
         </div>
       )}
       
-      {/* List items */}
+      {/* List items with custom drag-and-drop */}
       <ul className="space-y-2">
-        {items.length === 0 && !isLoading ? (
+        {isLoading ? (
+          <li className="text-gray-400 text-center py-4">Loading...</li>
+        ) : items.length === 0 ? (
           <li className="text-gray-500 dark:text-gray-400 text-center py-4">
             No items yet. Add your first one above.
           </li>
         ) : (
           items.map((item, index) => (
-            <li 
-              key={index} 
-              className="card flex items-center justify-between transition-all duration-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700"
+            <li
+              key={item._id || `item-${index}`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragEnd={handleDragEnd}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnter={handleDragEnter}
+              className={`card flex items-center justify-between transition-all duration-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 bg-white/30 dark:bg-white/10 border border-white/20 backdrop-blur-sm cursor-move ${draggedIndex === index ? 'opacity-50' : ''}`}
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                transform: draggedIndex === index ? 'rotate(3deg)' : 'none',
+              }}
             >
               {editingIndex === index ? (
                 <div className="flex-grow flex">
@@ -301,7 +370,7 @@ const List = ({ type }) => {
                     onChange={(e) => setEditText(e.target.value)}
                     autoFocus
                   />
-                  <button 
+                  <button
                     onClick={() => saveEdit(index)}
                     className="ml-2 btn bg-primary text-white dark:bg-blue-600 dark:hover:bg-blue-700"
                   >
@@ -310,10 +379,18 @@ const List = ({ type }) => {
                 </div>
               ) : (
                 <>
-                  <span className="flex items-center dark:text-gray-200">
-                    <span className="mr-2">{getItemEmoji()}</span>
-                    {item.text}
-                  </span>
+                  <div className="flex items-center flex-grow">
+                    {/* Drag handle */}
+                    <span className="mr-3 text-gray-400 cursor-grab active:cursor-grabbing">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M7 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM13 14a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"></path>
+                      </svg>
+                    </span>
+                    <span className="flex items-center dark:text-gray-200">
+                      <span className="mr-2">{getItemEmoji()}</span>
+                      {item.text}
+                    </span>
+                  </div>
                   {/* Show images if present */}
                   {item.images && item.images.length > 0 && (
                     <div className="flex flex-wrap gap-1 ml-2">
@@ -328,7 +405,7 @@ const List = ({ type }) => {
                     </div>
                   )}
                   <div className="flex space-x-1">
-                    <button 
+                    <button
                       onClick={() => startEditing(index)}
                       className="p-1 text-gray-500 hover:text-primary transition-colors duration-200 dark:text-gray-400 dark:hover:text-blue-400"
                       aria-label="Edit"
@@ -337,7 +414,7 @@ const List = ({ type }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
-                    <button 
+                    <button
                       onClick={() => deleteItem(index)}
                       className="p-1 text-gray-500 hover:text-noise transition-colors duration-200 dark:text-gray-400 dark:hover:text-red-400"
                       aria-label="Delete"
