@@ -9,6 +9,7 @@ const List = ({ type }) => {
   const [editText, setEditText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]); // For new item images
 
   // Fetch items when type changes
   const fetchItems = useCallback(async () => {
@@ -43,25 +44,36 @@ const List = ({ type }) => {
   const addItem = async () => {
     if (!newItem.trim()) return;
     
-    const updatedItems = [...items, { text: newItem.trim(), completed: false }];
-    
+    // Prepare FormData for text and images
+    const formData = new FormData();
+    formData.append('text', newItem.trim());
+    selectedImages.forEach((img, idx) => {
+      formData.append('images', img);
+    });
+    formData.append('completed', false);
+
+    // Optimistically update UI
+    const tempImages = selectedImages.map(img => URL.createObjectURL(img));
+    const updatedItems = [...items, { text: newItem.trim(), completed: false, images: tempImages }];
     try {
-      // Optimistically update UI
       setItems(updatedItems);
       setNewItem('');
-      
-      // Save to server
-      await axios.post(`${serverUrl}/api/lists/${type}`, { text: newItem.trim() });
-      
+      setSelectedImages([]);
+
+      // Save to server (multipart/form-data)
+      await axios.post(`${serverUrl}/api/lists/${type}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
     } catch (err) {
       console.error(`Error adding ${type} item:`, err);
       setError(`Failed to add item. Please try again.`);
-      
+
       // Still update local storage even if server fails
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
-      
+
       // Register for background sync when online
       if ('serviceWorker' in navigator && 'SyncManager' in window) {
         const registration = await navigator.serviceWorker.ready;
@@ -202,15 +214,36 @@ const List = ({ type }) => {
       
       {/* Form to add new items */}
       <form onSubmit={handleSubmit} className="mb-6">
-        <div className="flex">
+        <div className="flex items-center gap-2">
           <input
             type="text"
-            className="input-field flex-grow mr-2 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
+            className="input-field flex-grow dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
             placeholder={type === 'signal' ? 'Add a focus activity...' : 'Add a distraction...'}
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             required
+            style={{ minWidth: 0 }}
           />
+          {/* Hidden file input */}
+          <input
+            id="file-upload"
+            type="file"
+            accept="image/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={e => setSelectedImages(Array.from(e.target.files))}
+          />
+          {/* Cloud icon as file upload trigger */}
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer flex items-center justify-center h-10 w-10 rounded transition"
+           
+          >
+            {/* Inline SVG for cloud icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-7 w-7" stroke="currentColor" strokeWidth="1.5">
+              <path d="M7.5 18.5h9a4 4 0 0 0 0-8c-.1 0-.2 0-.3.01A6 6 0 1 0 6.5 15.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </label>
           <button 
             type="submit" 
             className={`btn-${type === 'signal' ? 'primary' : 'secondary'} px-4 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white`}
@@ -218,6 +251,19 @@ const List = ({ type }) => {
             Add
           </button>
         </div>
+        {/* Preview selected images */}
+        {selectedImages.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {selectedImages.map((img, idx) => (
+              <img
+                key={idx}
+                src={URL.createObjectURL(img)}
+                alt={`preview-${idx}`}
+                className="h-12 w-12 object-cover rounded border"
+              />
+            ))}
+          </div>
+        )}
       </form>
       
       {/* Loading state */}
@@ -268,6 +314,19 @@ const List = ({ type }) => {
                     <span className="mr-2">{getItemEmoji()}</span>
                     {item.text}
                   </span>
+                  {/* Show images if present */}
+                  {item.images && item.images.length > 0 && (
+                    <div className="flex flex-wrap gap-1 ml-2">
+                      {item.images.map((imgUrl, i) => (
+                        <img
+                          key={i}
+                          src={imgUrl}
+                          alt={`task-img-${i}`}
+                          className="h-8 w-8 object-cover rounded border"
+                        />
+                      ))}
+                    </div>
+                  )}
                   <div className="flex space-x-1">
                     <button 
                       onClick={() => startEditing(index)}

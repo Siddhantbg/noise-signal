@@ -1,6 +1,8 @@
+
 const express = require('express');
 const router = express.Router();
 const TaskList = require('../models/TaskList');
+const upload = require('../multerCloudinary');
 
 // Get list by type
 router.get('/:type', async (req, res) => {
@@ -20,28 +22,37 @@ router.get('/:type', async (req, res) => {
   }
 });
 
-// Add item to list
-router.post('/:type', async (req, res) => {
+// Add item to list (with image upload)
+router.post('/:type', upload.array('images', 10), async (req, res) => {
   try {
     const { type } = req.params;
     const { text } = req.body;
-    
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      imageUrls = req.files.map(file => file.path); // Cloudinary URL
+    }
+
     let list = await TaskList.findOne({ type });
     if (!list) {
       list = new TaskList({ type, items: [] });
     }
-    
+
     list.items.push({
       text,
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date(),
+      images: imageUrls
     });
-    
+
     await list.save();
     res.json({ type: list.type, entries: list.items });
   } catch (err) {
     console.error('Error adding item to list:', err);
-    res.status(500).json({ error: 'Error adding item to list' });
+    // Log full error details for debugging
+    if (err instanceof Error) {
+      console.error(err.stack);
+    }
+    res.status(500).json({ error: err.message || 'Error adding item to list', details: err });
   }
 });
 

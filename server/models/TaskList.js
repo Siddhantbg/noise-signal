@@ -9,7 +9,8 @@ const TaskListSchema = new mongoose.Schema({
   items: [{
     text: String,
     completed: Boolean,
-    createdAt: Date
+    createdAt: Date,
+    images: [String] // Array of Cloudinary URLs
   }]
 }, { timestamps: true });
 
