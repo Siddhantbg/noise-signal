@@ -86,16 +86,6 @@ const List = ({ type }) => {
   };
 
 
-  // Handle drag end
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
-    const reordered = Array.from(items);
-    const [removed] = reordered.splice(result.source.index, 1);
-    reordered.splice(result.destination.index, 0, removed);
-    setItems(reordered);
-    // Optionally, send new order to server here
-    localStorage.setItem(`${type}Items`, JSON.stringify(reordered));
-  };
 
   // Add a new item
   const addItem = async () => {
