@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { serverUrl } from '../apiConfig';
 
 const List = ({ type }) => {
@@ -112,12 +113,28 @@ const List = ({ type }) => {
 
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
+      
+      // Show success toast
+      toast.success(`Item added to ${type === 'signal' ? 'Signal' : 'Noise'} list!`, {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (err) {
       console.error(`Error adding ${type} item:`, err);
       setError(`Failed to add item. Please try again.`);
 
       // Still update local storage even if server fails
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
+
+      // Show error toast
+      toast.error(`Failed to add item to ${type === 'signal' ? 'Signal' : 'Noise'} list. Saved locally.`, {
+        position: 'top-center',
+        autoClose: 3000,
+      });
 
       // Register for background sync when online
       if ('serviceWorker' in navigator && 'SyncManager' in window) {
@@ -150,12 +167,28 @@ const List = ({ type }) => {
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
+      
+      // Show success toast
+      toast.success(`Item updated in ${type === 'signal' ? 'Signal' : 'Noise'} list!`, {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (err) {
       console.error(`Error updating ${type} item:`, err);
       setError(`Failed to update item. Please try again.`);
       
       // Still update local storage even if server fails
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
+      
+      // Show error toast
+      toast.error(`Failed to update item in ${type === 'signal' ? 'Signal' : 'Noise'} list. Updated locally.`, {
+        position: 'top-center',
+        autoClose: 3000,
+      });
       
       // Register for background sync when online
       if ('serviceWorker' in navigator && 'SyncManager' in window) {
@@ -179,12 +212,28 @@ const List = ({ type }) => {
       
       // Update local storage as backup
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
+      
+      // Show success toast
+      toast.success(`Item removed from ${type === 'signal' ? 'Signal' : 'Noise'} list!`, {
+        position: 'top-center',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (err) {
       console.error(`Error deleting ${type} item:`, err);
       setError(`Failed to delete item. Please try again.`);
       
       // Still update local storage even if server fails
       localStorage.setItem(`${type}Items`, JSON.stringify(updatedItems));
+      
+      // Show error toast
+      toast.error(`Failed to remove item from ${type === 'signal' ? 'Signal' : 'Noise'} list. Removed locally.`, {
+        position: 'top-center',
+        autoClose: 3000,
+      });
       
       // Register for background sync when online
       if ('serviceWorker' in navigator && 'SyncManager' in window) {
