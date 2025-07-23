@@ -170,12 +170,15 @@ function App() {
 
   return (
     <div className="min-h-screen relative">
-
       
       <div className="container mx-auto px-4 py-6 max-w-md">
         {/* App Header */}
-        <header className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-primary">Noise & Signal</h1>
+        <header className="mb-8 flex justify-between items-center">
+          <div className="card-glass px-4 py-2">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Noise & Signal
+            </h1>
+          </div>
           <div className="flex items-center space-x-2">
             {/* Dark Mode Toggle */}
             <button 
@@ -188,7 +191,7 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
@@ -234,12 +237,30 @@ function App() {
         
         {/* Error message if any */}
         {error && (
-          <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md dark:bg-red-900 dark:text-red-200">
-            {error}
+          <div className="mt-6 p-4 bg-red-100/90 backdrop-blur-sm text-red-700 rounded-xl dark:bg-red-900/60 dark:text-red-200 border border-red-200/50 dark:border-red-800/30 shadow-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {error}
+            </div>
           </div>
         )}
       </div>
-      <ToastContainer position="top-center" />
+      <ToastContainer 
+        position="top-center" 
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={isDarkMode ? "dark" : "light"}
+        className="backdrop-blur-sm"
+        toastClassName="backdrop-blur-md bg-white/90 dark:bg-gray-800/90 border border-white/20 dark:border-gray-700/20"
+      />
     </div>
   );
 } 

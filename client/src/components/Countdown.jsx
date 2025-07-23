@@ -36,23 +36,65 @@ const Countdown = ({ targetDate }) => {
   };
   
   return (
-    <div className="mb-8">
-      <div className="card p-6 text-center">
-        <h2 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">Time Remaining</h2>
-        <div className="text-4xl font-bold countdown-pulse">
-          <span className="text-primary">{formatTime(timeLeft.hours)}</span>
-          <span className="text-gray-400 dark:text-gray-500 mx-1">:</span>
-          <span className="text-primary">{formatTime(timeLeft.minutes)}</span>
-          <span className="text-gray-400 dark:text-gray-500 mx-1">:</span>
-          <span className="text-primary">{formatTime(timeLeft.seconds)}</span>
+    <div className="mb-8 float-animation">
+      <div className="countdown-display p-8 text-center glow-animation">
+        <div className="flex items-center justify-center mb-4">
+          <svg className="w-6 h-6 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Time Remaining</h2>
         </div>
-        <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          <span>Hours</span>
-          <span className="mx-6">Minutes</span>
-          <span>Seconds</span>
+        
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {/* Hours */}
+          <div className="text-center">
+            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30 dark:border-gray-700/30">
+              <div className="text-3xl font-bold text-primary countdown-pulse">
+                {formatTime(timeLeft.hours)}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                Hours
+              </div>
+            </div>
+          </div>
+          
+          {/* Minutes */}
+          <div className="text-center">
+            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30 dark:border-gray-700/30">
+              <div className="text-3xl font-bold text-primary countdown-pulse">
+                {formatTime(timeLeft.minutes)}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                Minutes
+              </div>
+            </div>
+          </div>
+          
+          {/* Seconds */}
+          <div className="text-center">
+            <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/30 dark:border-gray-700/30">
+              <div className="text-3xl font-bold text-primary countdown-pulse">
+                {formatTime(timeLeft.seconds)}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-300 font-medium mt-1">
+                Seconds
+              </div>
+            </div>
+          </div>
         </div>
+        
+        {/* Progress indicator */}
+        <div className="w-full bg-gray-200/50 dark:bg-gray-700/50 rounded-full h-2 backdrop-blur-sm">
+          <div 
+            className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-1000"
+            style={{ width: `${Math.max(0, Math.min(100, (timeLeft.seconds / 60) * 100))}%` }}
+          ></div>
+        </div>
+        
         {timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0 && (
-          <div className="mt-4 text-signal font-medium">Time's up!</div>
+          <div className="mt-4 p-3 bg-green-500/20 text-green-700 dark:text-green-300 font-medium rounded-lg backdrop-blur-sm border border-green-500/30">
+            ⏰ Time's up!
+          </div>
         )}
       </div>
     </div>

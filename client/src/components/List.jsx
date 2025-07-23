@@ -219,7 +219,7 @@ const List = ({ type }) => {
     } else if (hour >= 20 && hour < 23) {
       return { text: 'Reading Time', emoji: '📚' };
     } else {
-      return { text: 'Rest & Recovery', emoji: '😴' };
+      return { text: 'Sleep & Recharge', emoji: '😴' };
     }
   };
 
@@ -234,13 +234,13 @@ const List = ({ type }) => {
     <div>
       {/* List header with description */}
       <div className="mb-4">
-        <h2 className={`text-xl font-semibold ${type === 'signal' ? 'text-signal' : 'text-noise'}`}>
+        <h2 className="text-xl font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           {type === 'signal' ? 'Signal' : 'Noise'}
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
           {type === 'signal' 
-            ? 'Activities that move you forward' 
-            : 'Distractions to avoid'}
+            ? 'Important tasks that drive progress' 
+            : 'Distractions that reduce focus'}
         </p>
       </div>
       
@@ -258,70 +258,90 @@ const List = ({ type }) => {
       )}
       
       {/* Form to add new items */}
-      <form onSubmit={handleSubmit} className="mb-6">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            className="input-field flex-grow dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
-            placeholder={type === 'signal' ? 'Add a focus activity...' : 'Add a distraction...'}
-            value={newItem}
-            onChange={(e) => setNewItem(e.target.value)}
-            required
-            style={{ minWidth: 0 }}
-          />
-          {/* Hidden file input */}
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/*"
-            multiple
-            style={{ display: 'none' }}
-            onChange={e => setSelectedImages(Array.from(e.target.files))}
-          />
-          {/* Cloud icon as file upload trigger */}
-          <label
-            htmlFor="file-upload"
-            className="cursor-pointer flex items-center justify-center h-10 w-10 rounded transition"
-           
-          >
-            {/* Inline SVG for cloud icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-7 w-7" stroke="currentColor" strokeWidth="1.5">
-              <path d="M7.5 18.5h9a4 4 0 0 0 0-8c-.1 0-.2 0-.3.01A6 6 0 1 0 6.5 15.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </label>
-          <button 
-            type="submit" 
-            className={`btn-${type === 'signal' ? 'primary' : 'secondary'} px-4 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white`}
-          >
-            Add
-          </button>
-        </div>
-        {/* Preview selected images */}
-        {selectedImages.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {selectedImages.map((img, idx) => (
-              <img
-                key={idx}
-                src={URL.createObjectURL(img)}
-                alt={`preview-${idx}`}
-                className="h-12 w-12 object-cover rounded border"
-              />
-            ))}
+      <div className="card-glass mb-8">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              className="input-field flex-grow"
+              placeholder={type === 'signal' ? 'Add an important task...' : 'Add a distraction...'}
+              value={newItem}
+              onChange={(e) => setNewItem(e.target.value)}
+              required
+              style={{ minWidth: 0 }}
+            />
+            {/* Hidden file input */}
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              style={{ display: 'none' }}
+              onChange={e => setSelectedImages(Array.from(e.target.files))}
+            />
+            {/* Cloud icon as file upload trigger */}
+            <label
+              htmlFor="file-upload"
+              className="theme-toggle cursor-pointer flex items-center justify-center h-12 w-12"
+              title="Upload images"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-6 w-6" stroke="currentColor" strokeWidth="1.5">
+                <path d="M7.5 18.5h9a4 4 0 0 0 0-8c-.1 0-.2 0-.3.01A6 6 0 1 0 6.5 15.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </label>
+            <button 
+              type="submit" 
+              className={`btn ${type === 'signal' ? 'btn-primary' : 'btn-secondary'} px-6 py-3 flex items-center space-x-2`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Add</span>
+            </button>
           </div>
-        )}
-      </form>
+          {/* Preview selected images */}
+          {selectedImages.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-3 border-t border-white/20 dark:border-gray-700/20">
+              {selectedImages.map((img, idx) => (
+                <div key={idx} className="relative">
+                  <img
+                    src={URL.createObjectURL(img)}
+                    alt={`preview-${idx}`}
+                    className="h-16 w-16 object-cover rounded-lg border border-white/30 dark:border-gray-700/30 shadow-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSelectedImages(selectedImages.filter((_, i) => i !== idx))}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </form>
+      </div>
       
       {/* Loading state */}
       {isLoading && (
-        <div className="flex justify-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+        <div className="card-glass text-center py-8">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            <p className="text-gray-600 dark:text-gray-300">Loading {type} items...</p>
+          </div>
         </div>
       )}
       
       {/* Error message */}
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
-          {error}
+        <div className="mb-6 p-4 bg-red-100/90 backdrop-blur-sm text-red-700 rounded-xl dark:bg-red-900/60 dark:text-red-200 border border-red-200/50 dark:border-red-800/30 shadow-lg">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {error}
+          </div>
         </div>
       )}
       
@@ -330,9 +350,29 @@ const List = ({ type }) => {
         {isLoading ? (
           <li className="text-gray-400 text-center py-4">Loading...</li>
         ) : items.length === 0 ? (
-          <li className="text-gray-500 dark:text-gray-400 text-center py-4">
-            No items yet. Add your first one above.
-          </li>
+          <div className="card-glass text-center py-12">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 bg-gray-200/50 dark:bg-gray-700/50 rounded-full flex items-center justify-center">
+                {type === 'signal' ? (
+                  <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  </svg>
+                ) : (
+                  <svg className="w-8 h-8 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                )}
+              </div>
+              <div className="space-y-2">
+                <p className="text-gray-600 dark:text-gray-300 font-medium">
+                  No {type} items yet
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                  {type === 'signal' ? 'Add your important focus activities above' : 'Add your distractions to track above'}
+                </p>
+              </div>
+            </div>
+          </div>
         ) : (
           items.map((item, index) => (
             <li
@@ -343,7 +383,7 @@ const List = ({ type }) => {
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, index)}
               onDragEnter={handleDragEnter}
-              className={`card flex items-center justify-between transition-all duration-200 hover:shadow-md dark:bg-gray-800 dark:border-gray-700 bg-white/30 dark:bg-white/10 border border-white/20 backdrop-blur-sm cursor-move ${draggedIndex === index ? 'opacity-50' : ''}`}
+              className={`task-item group flex items-center justify-between cursor-move ${draggedIndex === index ? 'task-item-dragging' : ''}`}
               style={{
                 background: 'rgba(255,255,255,0.15)',
                 transform: draggedIndex === index ? 'rotate(3deg)' : 'none',
@@ -404,7 +444,7 @@ const List = ({ type }) => {
                     </button>
                     <button
                       onClick={() => deleteItem(index)}
-                      className="p-1 text-gray-500 hover:text-noise transition-colors duration-200 dark:text-gray-400 dark:hover:text-red-400"
+                      className="p-1 text-gray-500 hover:text-red-500 transition-colors duration-200 dark:text-gray-400 dark:hover:text-red-400"
                       aria-label="Delete"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
