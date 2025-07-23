@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { getUserId } from './utils/userId';
 import axios from 'axios';
 import { serverUrl } from './apiConfig';
 import Countdown from './components/Countdown';
 import TabSwitcher from './components/TabSwitcher';
 import List from './components/List';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Settings from './components/Settings';
 import { useBackground } from './hooks/useBackground';
 import { gsap } from 'gsap';
@@ -63,9 +66,9 @@ function App() {
     const fetchInitialData = async () => {
       try {
         setIsLoading(true);
-        
-        // Fetch countdown target
-        const countdownRes = await axios.get(`${serverUrl}/api/countdown`);
+        const userId = getUserId();
+        // Fetch countdown target for this user
+        const countdownRes = await axios.get(`${serverUrl}/api/countdown`, { params: { userId } });
         if (countdownRes.data && countdownRes.data.targetTime) {
           setCountdownTarget(new Date(countdownRes.data.targetTime));
         } else {
@@ -74,12 +77,9 @@ function App() {
           defaultTarget.setHours(defaultTarget.getHours() + 24);
           setCountdownTarget(defaultTarget);
         }
-        
-
       } catch (err) {
         console.error('Error fetching initial data:', err);
         setError('Failed to load app data. Please try again.');
-        
         // Set default countdown even if fetch fails
         const defaultTarget = new Date();
         defaultTarget.setHours(defaultTarget.getHours() + 24);
@@ -88,7 +88,6 @@ function App() {
         setIsLoading(false);
       }
     };
-    
     fetchInitialData();
   }, []);
 
@@ -96,7 +95,9 @@ function App() {
   const updateCountdownTarget = async (newTarget) => {
     try {
       setCountdownTarget(newTarget);
-      await axios.post(`${serverUrl}/api/countdown`, { targetTime: newTarget.toISOString() });
+      const userId = getUserId();
+      await axios.post(`${serverUrl}/api/countdown`, { userId, targetTime: newTarget.toISOString() });
+      toast.success('Countdown updated!', { position: 'top-center', autoClose: 2000 });
     } catch (err) {
       console.error('Error updating countdown:', err);
       // Store in local storage as fallback
@@ -238,6 +239,7 @@ function App() {
           </div>
         )}
       </div>
+      <ToastContainer position="top-center" />
     </div>
   );
 } 

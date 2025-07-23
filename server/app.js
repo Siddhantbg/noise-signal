@@ -78,17 +78,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// Place body parsers BEFORE routes so they can parse request bodies
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true }));
 
+// Routes
 app.use('/api/countdown', countdownRoutes);
 app.use('/api/backgrounds', require('./routes/backgroundsRoutes'));
 app.use('/api/user/background', require('./routes/userSettingsRoutes'));
 app.use('/api/background', backgroundRoutes);
 app.use('/api/lists', listRoutes);
-
-// Place body parsers after Multer routes to avoid breaking file uploads
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true }));
 
 // Add a catch-all route to see what's being requested
 app.use('*', (req, res) => {

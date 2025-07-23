@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
+
 const CountdownSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+    index: true
+  },
   targetTime: {
     type: Date,
     required: true

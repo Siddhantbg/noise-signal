@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { getUserId } from '../utils/userId';
+import { toast } from 'react-toastify';
 import { serverUrl } from '../apiConfig';
 
 export const useBackground = () => {
   const [background, setBackground] = useState({ type: '', value: '' });
+  const [backgroundError, setBackgroundError] = useState(null);
 
   const applyBackground = useCallback((type, value) => {
     if (type === 'custom') {
@@ -46,9 +48,11 @@ export const useBackground = () => {
     fetchSettings();
   }, [applyBackground]);
 
+
   const updateBackground = async (type, value) => {
     const userId = getUserId();
     setBackground({ type, value });
+    setBackgroundError(null);
     applyBackground(type, value);
 
     if (type === 'custom') {
@@ -62,16 +66,20 @@ export const useBackground = () => {
       localStorage.removeItem('selectedBackground');
     }
 
+    const toastId = toast.loading('Saving background...');
     try {
       await axios.post(`${serverUrl}/api/user/background`, {
         userId,
         backgroundType: type,
         backgroundValue: value,
       });
+      toast.update(toastId, { render: 'Background saved!', type: 'success', isLoading: false, autoClose: 2000 });
     } catch (err) {
+      setBackgroundError('Failed to save background. Please try again.');
+      toast.update(toastId, { render: 'Failed to save background.', type: 'error', isLoading: false, autoClose: 3000 });
       console.error('Error saving background:', err);
     }
   };
 
-  return { background, updateBackground };
+  return { background, updateBackground, backgroundError };
 };

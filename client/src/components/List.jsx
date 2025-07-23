@@ -85,8 +85,6 @@ const List = ({ type }) => {
     e.preventDefault();
   };
 
-
-
   // Add a new item
   const addItem = async () => {
     if (!newItem.trim()) return;

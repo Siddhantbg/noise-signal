@@ -2,11 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { serverUrl } from '../apiConfig';
 import { useBackground } from '../hooks/useBackground';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const BackgroundSettings = () => {
   const [predefinedBackgrounds, setPredefinedBackgrounds] = useState([]);
   const fileInputRef = useRef(null);
-  const { background, updateBackground } = useBackground();
+  const { background, updateBackground, backgroundError } = useBackground();
 
   useEffect(() => {
     const fetchBackgrounds = async () => {
@@ -43,7 +46,13 @@ const BackgroundSettings = () => {
 
   return (
     <div className="mt-6">
+      <ToastContainer position="top-center" />
       <h4 className="font-semibold mb-2 text-gray-700 dark:text-gray-300">Background</h4>
+      {backgroundError && (
+        <div className="mb-2 p-2 bg-red-100 text-red-700 rounded text-sm">
+          {backgroundError}
+        </div>
+      )}
       <div className="flex overflow-x-auto space-x-3 mb-4 pb-2">
         {predefinedBackgrounds.map((bg) => (
           <div
